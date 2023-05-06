@@ -80,7 +80,7 @@ class SearchSort:
 
     def ucs(self):
         queue = PriorityQueue()
-        queue.put((0, 0,self.array))
+        queue.put((0, 0, self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -94,6 +94,41 @@ class SearchSort:
             elements = self._expand_child(current, visited, costs)
             for idx, el in enumerate(elements):
                 queue.put((costs[tuple(el)], idx+1+expansions, el))
+
+    def greedy(self):
+        queue = PriorityQueue()
+        queue.put((self._hamming_distance(self.array), 0, self.array))
+        visited = {tuple(self.array): None}
+        costs = {tuple(self.array): 0}
+        expansions = 0
+
+        while not queue.empty():
+            _, _, current = queue.get()
+            expansions += 1
+            if self.goal == current:
+                path = self._soluction_path(current, visited)
+                return costs[tuple(self.goal)], expansions, path
+            elements = self._expand_child(current, visited, costs)
+            for idx, el in enumerate(elements):
+                queue.put((self._hamming_distance(el), idx+1+expansions, el))
+
+    def a_star(self):
+        queue = PriorityQueue()
+        queue.put((self._hamming_distance(self.array), 0, self.array))
+        visited = {tuple(self.array): None}
+        costs = {tuple(self.array): 0}
+        expansions = 0
+
+        while not queue.empty():
+            _, _, current = queue.get()
+            expansions += 1
+            if self.goal == current:
+                path = self._soluction_path(current, visited)
+                return costs[tuple(self.goal)], expansions, path
+            elements = self._expand_child(current, visited, costs)
+            for idx, el in enumerate(elements):
+                queue.put((costs[tuple(el)] + self._hamming_distance(el), idx+1+expansions, el))
+
 
     def result(self, costs, expansions, states):
         print(costs, expansions)
@@ -122,5 +157,7 @@ if __name__ == '__main__':
         search.result(*search.ucs())
     elif search.algorithm == 'A':
         print('A*')
+        search.result(*search.a_star())
     elif search.algorithm == 'G':
         print('GREEDY')
+        search.result(*search.greedy())
