@@ -1,5 +1,6 @@
 import sys
 from queue import Queue, PriorityQueue
+import timeit
 
 class SearchSort:
     def __init__(self):
@@ -8,7 +9,7 @@ class SearchSort:
         self.algorithm = None
         self.print_enabled = False
 
-    def _expand_child(self, current, visited, costs):
+    def _expand_child(self, current, visited, frontier, costs, type):
         n = len(self.array)
         elements = []
         for i in range(n):
@@ -16,15 +17,43 @@ class SearchSort:
                 new_cost = 2 if abs(i-j) == 1 else 4
                 new_array = current.copy()
                 new_array[i], new_array[j] = new_array[j], new_array[i]
-                # Evitar nós já gerados é burlar a árvore? tuple(new_array) not in visited
-                if new_array[i] < new_array[j]:
-                    costs[tuple(new_array)] = costs[tuple(current)] + new_cost
+
+                new_cost += costs[tuple(current)]
+
+                skip_visited_conditional = (tuple(new_array) not in visited)
+                better_cost_conditional = (tuple(new_array) not in costs or new_cost < costs[tuple(new_array)])
+                branch_reducer_conditional = new_array[i] < new_array[j]
+                conditional = branch_reducer_conditional
+                
+                if type == 'bfs' or type == 'ids':
+                    conditional = conditional and skip_visited_conditional
+                if type == 'ucs':
+                    on_frontier = False
+                    for element in frontier:
+                        if tuple(new_array) == tuple(element[-1]):
+                            on_frontier = True
+                            break
+                    # Add element if is not visited or is on the frontier with higher cost
+                    conditional = conditional and (skip_visited_conditional or (better_cost_conditional and on_frontier))
+
+                if conditional:
+                    costs[tuple(new_array)] = new_cost
                     visited[tuple(new_array)] = tuple(current)
                     elements.append(new_array)
         return elements
     
     def _hamming_distance(self, state):
+        """
+        Calcula a heurística que consiste na quantidade de elementos fora de sua posição ordenada.
+        """
         return sum(1 for i in range(len(state)) if state[i] != self.goal[i])
+
+    def _heuristic_sum_distances(self, state):
+        """
+        Calcula a heurística que consiste na soma das distâncias dos elementos do vetor v até a sua posição ordenada.
+        """
+        return sum([abs(i - self.goal.index(e)) for i, e in enumerate(state)])
+
 
     def _soluction_path(self, current, visited):
         # Constrói o caminho percorrido
@@ -49,7 +78,7 @@ class SearchSort:
             if self.goal == current:
                 path = self._soluction_path(current, visited)
                 return costs[tuple(self.goal)], expansions, path
-            elements = self._expand_child(current, visited, costs)
+            elements = self._expand_child(current, visited, queue.queue, costs, 'bfs')
             for el in elements:
                 queue.put(el)
 
@@ -72,7 +101,7 @@ class SearchSort:
                     return costs[tuple(self.goal)], expansions, path
                 # No early goal test (?)
                 expansions += 1
-                elements = self._expand_child(current, visited, costs)
+                elements = self._expand_child(current, visited, stack, costs, 'ids')
                 for el in elements:
                     stack.append((el,depth+1))
 
@@ -91,13 +120,20 @@ class SearchSort:
             if self.goal == current:
                 path = self._soluction_path(current, visited)
                 return costs[tuple(self.goal)], expansions, path
-            elements = self._expand_child(current, visited, costs)
+            elements = self._expand_child(current, visited, queue.queue, costs, 'ucs')
+        
+            aux_queue = PriorityQueue()
+            # Replacing existing elements on queue for those with better cost
+            for el in queue.queue:
+                if el[-1] not in elements:
+                    aux_queue.put(el)
             for idx, el in enumerate(elements):
-                queue.put((costs[tuple(el)], idx+1+expansions, el))
+                aux_queue.put((costs[tuple(el)], idx+1+expansions, el))
+            queue = aux_queue
 
     def greedy(self):
         queue = PriorityQueue()
-        queue.put((self._hamming_distance(self.array), 0, self.array))
+        queue.put((self._heuristic_sum_distances(self.array), 0, self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -108,13 +144,13 @@ class SearchSort:
             if self.goal == current:
                 path = self._soluction_path(current, visited)
                 return costs[tuple(self.goal)], expansions, path
-            elements = self._expand_child(current, visited, costs)
+            elements = self._expand_child(current, visited, queue.queue, costs, 'greedy')
             for idx, el in enumerate(elements):
-                queue.put((self._hamming_distance(el), idx+1+expansions, el))
+                queue.put((self._heuristic_sum_distances(el), idx+1+expansions, el))
 
     def a_star(self):
         queue = PriorityQueue()
-        queue.put((self._hamming_distance(self.array), 0, self.array))
+        queue.put((self._heuristic_sum_distances(self.array), 0, self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -125,9 +161,9 @@ class SearchSort:
             if self.goal == current:
                 path = self._soluction_path(current, visited)
                 return costs[tuple(self.goal)], expansions, path
-            elements = self._expand_child(current, visited, costs)
+            elements = self._expand_child(current, visited, queue.queue, costs, 'astar')
             for idx, el in enumerate(elements):
-                queue.put((costs[tuple(el)] + self._hamming_distance(el), idx+1+expansions, el))
+                queue.put((costs[tuple(el)] + self._heuristic_sum_distances(el), idx+1+expansions, el))
 
 
     def result(self, costs, expansions, states):
@@ -146,6 +182,8 @@ if __name__ == '__main__':
         search.array = list(map(int, sys.argv[3:3+size]))
         search.goal = sorted(search.array)
 
+    start = timeit.default_timer()
+
     if search.algorithm == 'B':
         print('BFS')
         search.result(*search.bfs())
@@ -161,3 +199,7 @@ if __name__ == '__main__':
     elif search.algorithm == 'G':
         print('GREEDY')
         search.result(*search.greedy())
+
+    end = timeit.default_timer()
+    print ('Duration: %f' % (end - start))
+
