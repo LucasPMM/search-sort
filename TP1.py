@@ -16,12 +16,16 @@ class SearchSort:
                 new_cost = 2 if abs(i-j) == 1 else 4
                 new_array = current.copy()
                 new_array[i], new_array[j] = new_array[j], new_array[i]
-                if tuple(new_array) not in visited and new_array[i] < new_array[j]:
+                # Evitar nós já gerados é burlar a árvore? tuple(new_array) not in visited
+                if new_array[i] < new_array[j]:
                     costs[tuple(new_array)] = costs[tuple(current)] + new_cost
                     visited[tuple(new_array)] = tuple(current)
                     elements.append(new_array)
         return elements
     
+    def _hamming_distance(self, state):
+        return sum(1 for i in range(len(state)) if state[i] != self.goal[i])
+
     def _soluction_path(self, current, visited):
         # Constrói o caminho percorrido
         path = [current]
@@ -49,7 +53,6 @@ class SearchSort:
             for el in elements:
                 queue.put(el)
 
-                   
     def ids(self):
         depth_limit = 0
         expansions = 0
@@ -91,7 +94,6 @@ class SearchSort:
             elements = self._expand_child(current, visited, costs)
             for idx, el in enumerate(elements):
                 queue.put((costs[tuple(el)], idx+1+expansions, el))
-
 
     def result(self, costs, expansions, states):
         print(costs, expansions)
