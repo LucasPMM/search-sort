@@ -1,5 +1,5 @@
 import sys
-from queue import Queue
+from queue import Queue, PriorityQueue
 
 class SearchSort:
     def __init__(self):
@@ -21,26 +21,30 @@ class SearchSort:
                     visited[tuple(new_array)] = tuple(current)
                     elements.append(new_array)
         return elements
+    
+    def _soluction_path(self, current, visited):
+        # Constrói o caminho percorrido
+        path = [current]
+        while current != None and current != self.array:
+            current = visited[tuple(current)]
+            if current != None:
+                path.append(current)
+        return path[::-1]
 
     def bfs(self):
         queue = Queue()
         queue.put(self.array)
-        visited = set()
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
+        if self.goal == self.array:
+            return 0, 0, [self.array]
         expansions = 0
         while not queue.empty():
             current = queue.get()
             expansions += 1
             if self.goal == current:
-                # Constrói o caminho percorrido
-                path = [current]
-                while current != None and current != self.array:
-                    current = visited[tuple(current)]
-                    if current != None:
-                        path.append(current)
-
-                return costs[tuple(self.goal)], expansions, path[::-1]
+                path = self._soluction_path(current, visited)
+                return costs[tuple(self.goal)], expansions, path
             elements = self._expand_child(current, visited, costs)
             for el in elements:
                 queue.put(el)
@@ -61,14 +65,8 @@ class SearchSort:
                     continue
 
                 if self.goal == current:
-                    # Constrói o caminho percorrido
-                    path = [current]
-                    while current != None and current != self.array:
-                        current = visited[tuple(current)]
-                        if current != None:
-                            path.append(current)
-
-                    return costs[tuple(self.goal)], expansions, path[::-1]
+                    path = self._soluction_path(current, visited)
+                    return costs[tuple(self.goal)], expansions, path
                 # No early goal test (?)
                 expansions += 1
                 elements = self._expand_child(current, visited, costs)
@@ -76,6 +74,24 @@ class SearchSort:
                     stack.append((el,depth+1))
 
             depth_limit += 1
+
+    def ucs(self):
+        queue = PriorityQueue()
+        queue.put((0, 0,self.array))
+        visited = {tuple(self.array): None}
+        costs = {tuple(self.array): 0}
+        expansions = 0
+
+        while not queue.empty():
+            _, _, current = queue.get()
+            expansions += 1
+            if self.goal == current:
+                path = self._soluction_path(current, visited)
+                return costs[tuple(self.goal)], expansions, path
+            elements = self._expand_child(current, visited, costs)
+            for idx, el in enumerate(elements):
+                queue.put((costs[tuple(el)], idx+1+expansions, el))
+
 
     def result(self, costs, expansions, states):
         print(costs, expansions)
@@ -101,6 +117,7 @@ if __name__ == '__main__':
         search.result(*search.ids())
     elif search.algorithm == 'U':
         print('UCS')
+        search.result(*search.ucs())
     elif search.algorithm == 'A':
         print('A*')
     elif search.algorithm == 'G':
