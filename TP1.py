@@ -21,18 +21,14 @@ class SearchSort:
                 new_cost += costs[tuple(current)]
 
                 skip_visited_conditional = (tuple(new_array) not in visited)
-                better_cost_conditional = (tuple(new_array) not in costs or new_cost < costs[tuple(new_array)])
                 branch_reducer_conditional = new_array[i] < new_array[j]
                 conditional = branch_reducer_conditional
                 
                 if type == 'bfs' or type == 'ids':
                     conditional = conditional and skip_visited_conditional
                 if type == 'ucs':
-                    on_frontier = False
-                    for element in frontier:
-                        if tuple(new_array) == tuple(element[-1]):
-                            on_frontier = True
-                            break
+                    on_frontier = tuple(new_array) in frontier
+                    better_cost_conditional = (tuple(new_array) not in costs or new_cost < costs[tuple(new_array)])
                     # Add element if is not visited or is on the frontier with higher cost
                     conditional = conditional and (skip_visited_conditional or (better_cost_conditional and on_frontier))
 
@@ -109,7 +105,9 @@ class SearchSort:
 
     def ucs(self):
         queue = PriorityQueue()
+        frontier = PriorityQueue()
         queue.put((0, 0, self.array))
+        frontier.put((self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -120,16 +118,10 @@ class SearchSort:
             if self.goal == current:
                 path = self._soluction_path(current, visited)
                 return costs[tuple(self.goal)], expansions, path
-            elements = self._expand_child(current, visited, queue.queue, costs, 'ucs')
-        
-            aux_queue = PriorityQueue()
-            # Replacing existing elements on queue for those with better cost
-            for el in queue.queue:
-                if el[-1] not in elements:
-                    aux_queue.put(el)
+            elements = self._expand_child(current, visited, frontier.queue, costs, 'ucs')
             for idx, el in enumerate(elements):
-                aux_queue.put((costs[tuple(el)], idx+1+expansions, el))
-            queue = aux_queue
+                queue.put((costs[tuple(el)], idx+1+expansions, el))
+                frontier.put((el))
 
     def greedy(self):
         queue = PriorityQueue()
