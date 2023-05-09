@@ -7,41 +7,20 @@ class Search():
         self.goal = sorted(initial)
         self.explored = []
         self.frontier = None
-        self.expanded = 0
+        self.expansions = 0
 
-    def init_frontier(self):
-        pass
-
-    def add_to_frontier(self, node):
-        # Cada algoritmo terá suas regras de inserção na fronteira
+    def add_to_frontier(self, node, iterator=None):
+        # Each search will define their rules
         pass
 
     def empty_frontier(self):
         return False
 
-    def next_node(self):
-        pass
-
-    def hamming_distance(self, node):
-        """
-        Calcula a heurística que consiste na quantidade de elementos fora de sua posição ordenada.
-        """
-        return sum(1 for i in range(len(node)) if node[i] != self.goal[i])
-
-    def set_explored(self, node):
-        self.explored.append(node.state)
-
-    def solution(self, node):
-        if node == None:
-            return
-        
-        node.soluction_path()
-
     def expand(self, node):
-        self.expanded += 1
+        self.expansions += 1
         n = len(self.initial)
-        print('vou expandir o node', node.state)
         current = node.state
+        elements = []
         for i in range(n):
             for j in range(i+1, n):
                 new_cost = 2 if abs(i-j) == 1 else 4
@@ -49,22 +28,37 @@ class Search():
                 new_array[i], new_array[j] = new_array[j], new_array[i]
 
                 new_cost += node.cost
-                print('vou comparar', new_array[i], new_array[j])
                 branch_reducer_conditional = new_array[i] < new_array[j]
-                print('comparei')
                 if branch_reducer_conditional:
                     new_node = Node(new_array, node, new_cost)
-                    self.add_to_frontier(new_node)
+                    elements.append(new_node)
+        for idx, el in enumerate(elements):
+            self.add_to_frontier(el, self.expansions + idx + 1)
+
+    def hamming_distance(self, node):
+        """
+        Number of elements on the wrong position
+        """
+        return sum(1 for i in range(len(node)) if node[i] != self.goal[i])
+
+    def init_frontier(self):
+        pass
+
+    def next_node(self):
+        pass
+
+    def set_explored(self, node):
+        self.explored.append(node.state)
 
     def start(self):
         self.init_frontier()
 
         while not self.empty_frontier():
+            print('FRONTIER', self.frontier)
             node = self.next_node()
-
+            print('CURRENT', node)
             if node.state == self.goal:
-                node.soluction_path()
-                return
+                return node.cost, self.expansions, node.solution_path()
             
             self.set_explored(node)
             self.expand(node)

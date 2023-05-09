@@ -1,15 +1,8 @@
 import sys
-from queue import Queue, PriorityQueue
 import timeit
-
-from BFS import * 
+from Algorithms import * 
 
 # class SearchSort:
-#     def __init__(self):
-#         self.array = []
-#         self.goal = []
-#         self.algorithm = None
-#         self.print_enabled = False
 
 #     def _expand_child(self, current, visited, frontier, costs, type):
 #         n = len(self.array)
@@ -40,39 +33,6 @@ from BFS import *
 #                     elements.append(new_array)
 #         return elements
     
-#     def _hamming_distance(self, state):
-#         """
-#         Calcula a heurística que consiste na quantidade de elementos fora de sua posição ordenada.
-#         """
-#         return sum(1 for i in range(len(state)) if state[i] != self.goal[i])
-
-#     def _soluction_path(self, current, visited):
-#         # Constrói o caminho percorrido
-#         path = [current]
-#         while current != None and current != self.array:
-#             current = visited[tuple(current)]
-#             if current != None:
-#                 path.append(current)
-#         return path[::-1]
-
-#     def bfs(self):
-#         queue = Queue()
-#         queue.put(self.array)
-#         visited = {tuple(self.array): None}
-#         costs = {tuple(self.array): 0}
-#         if self.goal == self.array:
-#             return 0, 0, [self.array]
-#         expansions = 0
-#         while not queue.empty():
-#             current = queue.get()
-#             expansions += 1
-#             if self.goal == current:
-#                 path = self._soluction_path(current, visited)
-#                 return costs[tuple(self.goal)], expansions, path
-#             elements = self._expand_child(current, visited, queue.queue, costs, 'bfs')
-#             for el in elements:
-#                 queue.put(el)
-
 #     def ids(self):
 #         depth_limit = 0
 #         expansions = 0
@@ -153,42 +113,42 @@ from BFS import *
 #                 queue.put((costs[tuple(el)] + self._hamming_distance(el), idx+1+expansions, el))
 
 
-#     def result(self, costs, expansions, states):
-#         print(costs, expansions)
-#         if self.print_enabled:
-#             for state in states:
-#                 print(*state)
-
 if __name__ == '__main__':
-    # search = SearchSort()
-
-    # search.algorithm = sys.argv[1]
+    algorithm = sys.argv[1]
     size = int(sys.argv[2])
-    # search.print_enabled = sys.argv[-1] == 'PRINT'
-    array = None
+    print_enabled = sys.argv[-1] == 'PRINT'
+
+    initial = None
     if size > 0:
-        array = list(map(int, sys.argv[3:3+size]))
+        initial = list(map(int, sys.argv[3:3+size]))
 
     start = timeit.default_timer()
 
-    # if search.algorithm == 'B':
-    print('BFS')
-    newSearch = BFS(array)
-    # elif search.algorithm == 'I':
-    #     print('IDS')
-    #     search.result(*search.ids())
-    # elif search.algorithm == 'U':
-    #     print('UCS')
-    #     search.result(*search.ucs())
-    # elif search.algorithm == 'A':
-    #     print('A*')
-    #     search.result(*search.a_star())
-    # elif search.algorithm == 'G':
-    #     print('GREEDY')
-    #     search.result(*search.greedy())
+    if algorithm == 'B':
+        print('BFS')
+        search = BFS(initial)
+    elif algorithm == 'I':
+        print('IDS')
+        search = IDS(initial)
+    elif algorithm == 'U':
+        print('UCS')
+        search = UCS(initial)
+    elif algorithm == 'A':
+        print('A*')
+        search = A_STAR(initial)
+    elif algorithm == 'G':
+        print('GREEDY')
+        search = GREEDY(initial)
 
-    newSearch.start()
-    
+    cost, expansions, path = search.start()
     end = timeit.default_timer()
-    print ('Duration: %f' % (end - start))
+
+    # Print results:
+    print(cost, expansions)
+    if print_enabled:
+        for state in path:
+            print(*state)
+    
+    # Only for tests purposes
+    print('Duration: %f' % (end - start))
 
