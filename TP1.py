@@ -44,13 +44,6 @@ class SearchSort:
         """
         return sum(1 for i in range(len(state)) if state[i] != self.goal[i])
 
-    def _heuristic_sum_distances(self, state):
-        """
-        Calcula a heurística que consiste na soma das distâncias dos elementos do vetor v até a sua posição ordenada.
-        """
-        return sum([abs(i - self.goal.index(e)) for i, e in enumerate(state)])
-
-
     def _soluction_path(self, current, visited):
         # Constrói o caminho percorrido
         path = [current]
@@ -125,7 +118,7 @@ class SearchSort:
 
     def greedy(self):
         queue = PriorityQueue()
-        queue.put((self._heuristic_sum_distances(self.array), 0, self.array))
+        queue.put((self._hamming_distance(self.array), 0, self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -138,11 +131,11 @@ class SearchSort:
                 return costs[tuple(self.goal)], expansions, path
             elements = self._expand_child(current, visited, queue.queue, costs, 'greedy')
             for idx, el in enumerate(elements):
-                queue.put((self._heuristic_sum_distances(el), idx+1+expansions, el))
+                queue.put((self._hamming_distance(el), idx+1+expansions, el))
 
     def a_star(self):
         queue = PriorityQueue()
-        queue.put((self._heuristic_sum_distances(self.array), 0, self.array))
+        queue.put((self._hamming_distance(self.array), 0, self.array))
         visited = {tuple(self.array): None}
         costs = {tuple(self.array): 0}
         expansions = 0
@@ -155,7 +148,7 @@ class SearchSort:
                 return costs[tuple(self.goal)], expansions, path
             elements = self._expand_child(current, visited, queue.queue, costs, 'astar')
             for idx, el in enumerate(elements):
-                queue.put((costs[tuple(el)] + self._heuristic_sum_distances(el), idx+1+expansions, el))
+                queue.put((costs[tuple(el)] + self._hamming_distance(el), idx+1+expansions, el))
 
 
     def result(self, costs, expansions, states):
