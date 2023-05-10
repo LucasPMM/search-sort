@@ -8,8 +8,9 @@ class Search():
         self.explored = []
         self.frontier = None
         self.expansions = 0
+        self.stored_expansions = 0
 
-    def add_to_frontier(self, node, iterator=None):
+    def add_to_frontier(self, node):
         # Each search will define their rules
         pass
 
@@ -17,7 +18,6 @@ class Search():
         return False
 
     def expand(self, node):
-        self.expansions += 1
         n = len(self.initial)
         current = node.state
         elements = []
@@ -30,10 +30,11 @@ class Search():
                 new_cost += node.cost
                 branch_reducer_conditional = new_array[i] < new_array[j]
                 if branch_reducer_conditional:
-                    new_node = Node(new_array, node, new_cost)
+                    new_node = Node(new_array, node, new_cost, self.expansions+1)
                     elements.append(new_node)
-        for idx, el in enumerate(elements):
-            self.add_to_frontier(el, self.expansions + idx + 1)
+        for el in elements:
+            self.add_to_frontier(el)
+        self.expansions += 1
 
     def hamming_distance(self, node):
         """
@@ -46,6 +47,12 @@ class Search():
 
     def next_node(self):
         pass
+
+    def reset(self):
+        self.stored_expansions += self.expansions
+        self.expansions = 0
+        self.explored = []
+        self.frontier = None
 
     def set_explored(self, node):
         self.explored.append(node.state)

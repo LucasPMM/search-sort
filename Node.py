@@ -1,10 +1,11 @@
 class Node():
     
-    def __init__(self, state, parent, cost):
+    def __init__(self, state, parent, cost, depth=None):
         self.state = state
         self.parent = parent
         self.cost = cost
         self.heuristic_cost = None
+        self.depth = depth
 
     # Rewrite some functions to print data rightely
     def __eq__(self, node):
