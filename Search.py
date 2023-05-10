@@ -7,6 +7,8 @@ class Search():
         self.goal = sorted(initial)
         self.explored = []
         self.frontier = None
+        self.frontier_control = set()
+        self.frontier_control.add(tuple(initial))
         self.expansions = 0
         self.stored_expansions = 0
 
@@ -53,6 +55,7 @@ class Search():
         self.expansions = 0
         self.explored = []
         self.frontier = None
+        self.frontier_control = set()
 
     def set_explored(self, node):
         self.explored.append(node.state)

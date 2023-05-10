@@ -1,5 +1,6 @@
 from Search import Search
 from Node import Node
+from heapq import *
 
 class BFS(Search):
     def __init__(self, initial):
@@ -61,21 +62,32 @@ class UCS(Search):
     def __init__(self, initial):
         super().__init__(initial)
 
-    # def init_frontier(self):
-    #     node = Node(self.initial, None, 0)
-    #     self.frontier = [(0, node)]
+    def init_frontier(self):
+        node = Node(self.initial, None, 0)
+        self.frontier = [(0, node)]
 
-    # def add_to_frontier(self, node):
-    #     if node.state in self.frontier or node.state in self.explored:
-    #         return
-    #     cost = self.hamming_distance(node.state)
-    #     heappush(self.frontier, (cost, node))
+    def add_to_frontier(self, node):
+        if node.state in self.explored:
+            return
 
-    # def empty_frontier(self):
-    #     return len(self.frontier) == 0
+        if tuple(node.state) in self.frontier_control:
+            # Check costs
+            index = list(map(lambda x: x[1], self.frontier)).index(node)
+            cost = self.frontier[index][1].cost
+            better_cost = node.cost < cost
+            if not better_cost:
+                return
+            self.frontier.pop(index)
+            heapify(self.frontier)
+
+        heappush(self.frontier, (node.cost, node))
+        self.frontier_control.add(tuple(node.state))
+
+    def empty_frontier(self):
+        return len(self.frontier) == 0
     
-    # def next_node(self):
-    #     return heappop(self.frontier)[1]
+    def next_node(self):
+        return heappop(self.frontier)[1]
 
 class GREEDY(Search):
     def __init__(self, initial):
