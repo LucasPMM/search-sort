@@ -42,7 +42,7 @@ class Search():
         """
         Number of elements on the wrong position
         """
-        return sum(1 for i in range(len(node)) if node[i] != self.goal[i])
+        return sum(1 for i in range(len(node.state)) if node.state[i] != self.goal[i])
 
     def init_frontier(self):
         pass
