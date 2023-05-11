@@ -1,16 +1,16 @@
 from Search import Search
 from Node import Node
-from heapq import *
+from queue import PriorityQueue
 
 class BFS(Search):
     def __init__(self, initial):
-        super().__init__(initial)
+        super().__init__(initial, 'B')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = [node]
 
-    def add_to_frontier(self, node):
+    def add_to_frontier(self, node, _):
         if node.state in self.frontier or node.state in self.explored:
             return
         self.frontier.append(node)
@@ -23,13 +23,13 @@ class BFS(Search):
     
 class IDS(Search):
     def __init__(self, initial):
-        super().__init__(initial)
+        super().__init__(initial, 'I')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0, 0)
         self.frontier = [node]
 
-    def add_to_frontier(self, node):
+    def add_to_frontier(self, node, _):
         if node.state in self.frontier or node.state in self.explored:
             return
         self.frontier.append(node)
@@ -60,72 +60,63 @@ class IDS(Search):
 
 class UCS(Search):
     def __init__(self, initial):
-        super().__init__(initial)
+        super().__init__(initial, 'U')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0)
-        self.frontier = [(0, node)]
+        self.frontier = PriorityQueue()
+        self.frontier.put((0, 0, node))
 
-    def add_to_frontier(self, node):
+    def add_to_frontier(self, node, iterator):
         if node.state in self.explored:
             return
-
-        if tuple(node.state) in self.frontier_control:
-            # Check costs
-            index = list(map(lambda x: x[1], self.frontier)).index(node)
-            cost = self.frontier[index][1].cost
-            better_cost = node.cost < cost
-            if not better_cost:
-                return
-            self.frontier.pop(index)
-            heapify(self.frontier)
-
-        heappush(self.frontier, (node.cost, node))
-        self.frontier_control.add(tuple(node.state))
+        self.frontier.put((node.cost, iterator, node))
 
     def empty_frontier(self):
-        return len(self.frontier) == 0
+        return self.frontier.empty()
     
     def next_node(self):
-        return heappop(self.frontier)[1]
+        _, _, node = self.frontier.get()
+        return node
 
 class GREEDY(Search):
     def __init__(self, initial):
-        super().__init__(initial)
+        super().__init__(initial, 'U')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0)
-        self.frontier = [(0, node)]
+        self.frontier = PriorityQueue()
+        self.frontier.put((self.hamming_distance(node), 0, node))
 
-    def add_to_frontier(self, node):
-        if node.state in self.explored or tuple(node.state) in self.frontier_control:
+    def add_to_frontier(self, node, iterator):
+        if node.state in self.explored:
             return
-
-        heappush(self.frontier, (self.hamming_distance(node), node))
-        self.frontier_control.add(tuple(node.state))
+        self.frontier.put((self.hamming_distance(node), iterator, node))
 
     def empty_frontier(self):
-        return len(self.frontier) == 0
+        return self.frontier.empty()
     
     def next_node(self):
-        return heappop(self.frontier)[1]
+        _, _, node = self.frontier.get()
+        return node
 
 class A_STAR(Search):
     def __init__(self, initial):
-        super().__init__(initial)
+        super().__init__(initial, 'U')
 
-    # def init_frontier(self):
-    #     node = Node(self.initial, None, 0)
-    #     self.frontier = [(0, node)]
+    def init_frontier(self):
+        node = Node(self.initial, None, 0)
+        self.frontier = PriorityQueue()
+        self.frontier.put((self.hamming_distance(node), 0, node))
 
-    # def add_to_frontier(self, node):
-    #     if node.state in self.frontier or node.state in self.explored:
-    #         return
-    #     cost = self.hamming_distance(node.state)
-    #     heappush(self.frontier, (cost, node))
+    def add_to_frontier(self, node, iterator):
+        if node.state in self.explored:
+            return
+        self.frontier.put((node.cost + self.hamming_distance(node), iterator, node))
 
-    # def empty_frontier(self):
-    #     return len(self.frontier) == 0
+    def empty_frontier(self):
+        return self.frontier.empty()
     
-    # def next_node(self):
-    #     return heappop(self.frontier)[1]
+    def next_node(self):
+        _, _, node = self.frontier.get()
+        return node

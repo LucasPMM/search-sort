@@ -4,7 +4,7 @@ class Node():
         self.state = state
         self.parent = parent
         self.cost = cost
-        self.heuristic_cost = None
+        self.heuristic_cost = 0
         self.depth = depth
 
     # Rewrite some functions to print data rightely
@@ -15,7 +15,7 @@ class Node():
     def __repr__(self):
         return self.__str__()
     def __str__(self):
-        return str('<' + str(self.state) + ', ' + str(self.cost) + '>')
+        return str('<' + str(self.state) + ', ' + str(self.cost + self.heuristic_cost) + '>')
 
     def set_heuristic_cost(self, cost):
         self.heuristic_cost = cost
