@@ -3,7 +3,7 @@ import os
 types = ['B','I','U','A','G']
 
 for type in reversed(types):
-    for i in range(20):
+    for i in range(10):
         print('==> T', i+1)
         arr = list(reversed(range(1, i+2)))
         arr_str = ' '.join(map(str, arr))
