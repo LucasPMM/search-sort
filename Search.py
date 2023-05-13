@@ -70,6 +70,8 @@ class Search():
             node = self.next_node()
             # print('CURRENT', node)
             if node.state == self.goal:
+                if self.algorithm in ['U', 'G', 'A']:
+                    self.expansions += 1
                 return node.cost, self.expansions, node.solution_path()
             
             if self.algorithm in ['U', 'A'] and node.state in self.explored:
