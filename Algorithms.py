@@ -81,7 +81,7 @@ class UCS(Search):
 
 class GREEDY(Search):
     def __init__(self, initial):
-        super().__init__(initial, 'U')
+        super().__init__(initial, 'G')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0)
@@ -102,7 +102,7 @@ class GREEDY(Search):
 
 class A_STAR(Search):
     def __init__(self, initial):
-        super().__init__(initial, 'U')
+        super().__init__(initial, 'A')
 
     def init_frontier(self):
         node = Node(self.initial, None, 0)
