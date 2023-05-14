@@ -66,9 +66,7 @@ class Search():
         self.init_frontier()
 
         while not self.empty_frontier():
-            # print('FRONTIER', self.frontier)
             node = self.next_node()
-            # print('CURRENT', node)
             if node.state == self.goal:
                 if self.algorithm in ['U', 'G', 'A']:
                     self.expansions += 1
@@ -82,4 +80,3 @@ class Search():
 
             self.set_explored(node)
             self.expand(node)
-            # print('EXPANSIONS', self.expansions)

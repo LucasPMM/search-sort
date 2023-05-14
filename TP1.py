@@ -14,19 +14,19 @@ if __name__ == '__main__':
     start = timeit.default_timer()
 
     if algorithm == 'B':
-        print('BFS')
+        # print('BFS')
         search = BFS(initial)
     elif algorithm == 'I':
-        print('IDS')
+        # print('IDS')
         search = IDS(initial)
     elif algorithm == 'U':
-        print('UCS')
+        # print('UCS')
         search = UCS(initial)
     elif algorithm == 'A':
-        print('A*')
+        # print('A*')
         search = A_STAR(initial)
     elif algorithm == 'G':
-        print('GREEDY')
+        # print('GREEDY')
         search = GREEDY(initial)
 
     cost, expansions, path = search.start()
@@ -39,5 +39,5 @@ if __name__ == '__main__':
             print(*state)
     
     # Only for tests purposes
-    print('Duration: %f' % (end - start))
+    # print('Duration: %f' % (end - start))
 

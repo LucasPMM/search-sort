@@ -15,7 +15,7 @@ class Node():
     def __repr__(self):
         return self.__str__()
     def __str__(self):
-        return str('<' + str(self.state) + ', ' + str(self.cost + self.heuristic_cost) + '>')
+        return str(str(self.state) + ', ' + str(self.cost + self.heuristic_cost))
 
     def set_heuristic_cost(self, cost):
         self.heuristic_cost = cost
