@@ -14,7 +14,7 @@ class Search():
         self.expansions = 0
         self.stored_expansions = 0
 
-    def add_to_frontier(self, node, iterator=None):
+    def frontier_push(self, node, iterator=None):
         # Each search will define their rules
         pass
 
@@ -37,7 +37,7 @@ class Search():
                     new_node = Node(new_array, node, new_cost, self.expansions+1)
                     elements.append(new_node)
         for idx, el in enumerate(elements):
-            self.add_to_frontier(el, idx+1+self.expansions)
+            self.frontier_push(el, idx+1+self.expansions)
         self.expansions += 1
 
     def hamming_distance(self, node):
@@ -46,7 +46,7 @@ class Search():
         """
         return sum(1 for i in range(len(node.state)) if node.state[i] != self.goal[i])
 
-    def init_frontier(self):
+    def start_frontier(self):
         pass
 
     def next_node(self):
@@ -63,7 +63,7 @@ class Search():
         self.explored.append(node.state)
 
     def start(self):
-        self.init_frontier()
+        self.start_frontier()
 
         while not self.empty_frontier():
             node = self.next_node()

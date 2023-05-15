@@ -7,11 +7,11 @@ class BFS(Search):
     def __init__(self, initial):
         super().__init__(initial, 'B')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = [node]
 
-    def add_to_frontier(self, node, _):
+    def frontier_push(self, node, _):
         if node.state in self.frontier or node.state in self.explored:
             return
         self.frontier.append(node)
@@ -26,11 +26,11 @@ class IDS(Search):
     def __init__(self, initial):
         super().__init__(initial, 'I')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0, 0)
         self.frontier = [node]
 
-    def add_to_frontier(self, node, _):
+    def frontier_push(self, node, _):
         if node.state in self.frontier or node.state in self.explored:
             return
         self.frontier.append(node)
@@ -42,7 +42,7 @@ class IDS(Search):
         depth_limit = 0
         while True:
             self.reset()
-            self.init_frontier()
+            self.start_frontier()
             while not self.empty_frontier():
                 node = self.next_node()
                 if node.depth > depth_limit:
@@ -65,12 +65,12 @@ class UCS(Search):
     def __init__(self, initial):
         super().__init__(initial, 'U')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = PriorityQueue()
         self.frontier.put((0, 0, node))
 
-    def add_to_frontier(self, node, iterator):
+    def frontier_push(self, node, iterator):
         if node.state in self.explored:
             return
         self.frontier.put((node.cost, iterator, node))
@@ -86,12 +86,12 @@ class GREEDY(Search):
     def __init__(self, initial):
         super().__init__(initial, 'G')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = PriorityQueue()
         self.frontier.put((self.hamming_distance(node), 0, node))
 
-    def add_to_frontier(self, node, iterator):
+    def frontier_push(self, node, iterator):
         if node.state in self.explored:
             return
         self.frontier.put((self.hamming_distance(node), iterator, node))
@@ -107,12 +107,12 @@ class A_STAR(Search):
     def __init__(self, initial):
         super().__init__(initial, 'A')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = PriorityQueue()
         self.frontier.put((self.hamming_distance(node), 0, node))
 
-    def add_to_frontier(self, node, iterator):
+    def frontier_push(self, node, iterator):
         if node.state in self.explored:
             return
         self.frontier.put((node.cost + self.hamming_distance(node), iterator, node))
@@ -130,11 +130,11 @@ class UCS_heap(Search):
     def __init__(self, initial):
         super().__init__(initial, 'U')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         self.frontier = [(node.cost, node)]
 
-    def add_to_frontier(self, node, _):
+    def frontier_push(self, node, _):
         if node.state in self.explored:
             return
 
@@ -162,13 +162,13 @@ class GREEDY_heap(Search):
     def __init__(self, initial):
         super().__init__(initial, 'G')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         heuristic_cost = self.hamming_distance(node)
         node.set_heuristic_cost(heuristic_cost)
         self.frontier = [(heuristic_cost, node)]
 
-    def add_to_frontier(self, node, _):
+    def frontier_push(self, node, _):
         if node.state in self.explored:
             return
 
@@ -197,13 +197,13 @@ class A_STAR_heap(Search):
     def __init__(self, initial):
         super().__init__(initial, 'A')
 
-    def init_frontier(self):
+    def start_frontier(self):
         node = Node(self.initial, None, 0)
         heuristic_cost = self.hamming_distance(node)
         node.set_heuristic_cost(heuristic_cost)
         self.frontier = [(heuristic_cost + node.cost, node)]
 
-    def add_to_frontier(self, node, _):
+    def frontier_push(self, node, _):
         if node.state in self.explored:
             return
         
