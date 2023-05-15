@@ -1,3 +1,4 @@
+from heapq import *
 from Node import Node
 
 class Search():
@@ -14,11 +15,11 @@ class Search():
         self.expansions = 0
         self.stored_expansions = 0
 
-    def frontier_push(self, node, iterator=None):
-        # Each search will define their rules
-        pass
-
     def empty_frontier(self):
+        if self.algorithm in ['B', 'I', 'Uh', 'Gh', 'Ah']:
+            return len(self.frontier) == 0
+        elif self.algorithm in ['U', 'G', 'A']:
+            return self.frontier.empty()
         return False
 
     def expand(self, node):
@@ -40,17 +41,21 @@ class Search():
             self.frontier_push(el, idx+1+self.expansions)
         self.expansions += 1
 
+    def frontier_push(self, node, iterator=None):
+        pass
+
     def hamming_distance(self, node):
-        """
-        Number of elements on the wrong position
-        """
+        # Number of elements on the wrong position
         return sum(1 for i in range(len(node.state)) if node.state[i] != self.goal[i])
 
-    def start_frontier(self):
-        pass
-
     def next_node(self):
-        pass
+        if self.algorithm in ['B', 'I']:
+            return self.frontier.pop(0)
+        elif self.algorithm in ['U', 'G', 'A']:
+            _, _, node = self.frontier.get()
+            return node
+        elif self.algorithm in ['Uh', 'Gh', 'Ah']:
+            return heappop(self.frontier)[1]
 
     def reset(self):
         self.stored_expansions += self.expansions
@@ -78,5 +83,9 @@ class Search():
                 # If the best cost node was already explored, there is no need to explore it again (UCS)
                 continue
 
-            self.set_explored(node)
+            if self.algorithm != 'I':
+                self.set_explored(node)
             self.expand(node)
+
+    def start_frontier(self):
+        pass

@@ -1,5 +1,8 @@
 class Node():
     
+    def __eq__(self, node):
+        return self.state == node
+
     def __init__(self, state, parent, cost, depth=None):
         self.state = state
         self.parent = parent
@@ -7,15 +10,8 @@ class Node():
         self.heuristic_cost = 0
         self.depth = depth
 
-    # Rewrite some functions to print data rightely
-    def __eq__(self, node):
-        return self.state == node
     def __lt__(self, node): 
         return self.cost < node.cost
-    def __repr__(self):
-        return self.__str__()
-    def __str__(self):
-        return str(str(self.state) + ', ' + str(self.cost + self.heuristic_cost))
 
     def set_heuristic_cost(self, cost):
         self.heuristic_cost = cost

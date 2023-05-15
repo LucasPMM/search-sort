@@ -15,13 +15,7 @@ class BFS(Search):
         if node.state in self.frontier or node.state in self.explored:
             return
         self.frontier.append(node)
-
-    def empty_frontier(self):
-        return len(self.frontier) == 0
-    
-    def next_node(self):
-        return self.frontier.pop(0)
-    
+        
 class IDS(Search):
     def __init__(self, initial):
         super().__init__(initial, 'I')
@@ -31,12 +25,9 @@ class IDS(Search):
         self.frontier = [node]
 
     def frontier_push(self, node, _):
-        if node.state in self.frontier or node.state in self.explored:
+        if node.state in self.frontier:
             return
         self.frontier.append(node)
-
-    def empty_frontier(self):
-        return len(self.frontier) == 0
     
     def start(self):
         depth_limit = 0
@@ -56,9 +47,6 @@ class IDS(Search):
 
             depth_limit += 1
     
-    def next_node(self):
-        return self.frontier.pop()
-
 # Using queue
 
 class UCS(Search):
@@ -75,13 +63,6 @@ class UCS(Search):
             return
         self.frontier.put((node.cost, iterator, node))
 
-    def empty_frontier(self):
-        return self.frontier.empty()
-    
-    def next_node(self):
-        _, _, node = self.frontier.get()
-        return node
-
 class GREEDY(Search):
     def __init__(self, initial):
         super().__init__(initial, 'G')
@@ -96,13 +77,6 @@ class GREEDY(Search):
             return
         self.frontier.put((self.hamming_distance(node), iterator, node))
 
-    def empty_frontier(self):
-        return self.frontier.empty()
-    
-    def next_node(self):
-        _, _, node = self.frontier.get()
-        return node
-
 class A_STAR(Search):
     def __init__(self, initial):
         super().__init__(initial, 'A')
@@ -116,13 +90,6 @@ class A_STAR(Search):
         if node.state in self.explored:
             return
         self.frontier.put((node.cost + self.hamming_distance(node), iterator, node))
-
-    def empty_frontier(self):
-        return self.frontier.empty()
-    
-    def next_node(self):
-        _, _, node = self.frontier.get()
-        return node
     
 # Using heapq:
 
@@ -146,16 +113,9 @@ class UCS_heap(Search):
             if not better_cost:
                 return
             self.frontier.pop(index)
-            heapify(self.frontier)
 
         heappush(self.frontier, (node.cost, node))
         self.frontier_control.add(tuple(node.state))
-
-    def empty_frontier(self):
-        return len(self.frontier) == 0
-    
-    def next_node(self):
-        return heappop(self.frontier)[1]
 
 
 class GREEDY_heap(Search):
@@ -181,17 +141,10 @@ class GREEDY_heap(Search):
             if not better_cost:
                 return
             self.frontier.pop(index)
-            heapify(self.frontier)
 
         node.set_heuristic_cost(cost)
         heappush(self.frontier, (cost, node))
         self.frontier_control.add(tuple(node.state))
-
-    def empty_frontier(self):
-        return len(self.frontier) == 0
-    
-    def next_node(self):
-        return heappop(self.frontier)[1]
 
 class A_STAR_heap(Search):
     def __init__(self, initial):
@@ -216,15 +169,7 @@ class A_STAR_heap(Search):
             if not better_cost:
                 return
             self.frontier.pop(index)
-            heapify(self.frontier)
 
         node.set_heuristic_cost(heuristic_cost)
         heappush(self.frontier, (node.cost + heuristic_cost, node))
         self.frontier_control.add(tuple(node.state))
-
-    def empty_frontier(self):
-        return len(self.frontier) == 0
-    
-    def next_node(self):
-        return heappop(self.frontier)[1]
-    
