@@ -83,8 +83,8 @@ class Search():
                 # If the best cost node was already explored, there is no need to explore it again (UCS)
                 continue
 
-            if self.algorithm != 'I':
-                self.set_explored(node)
+            # Evitar a fronteira na IDS?
+            self.set_explored(node)
             self.expand(node)
 
     def start_frontier(self):

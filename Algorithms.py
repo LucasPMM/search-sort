@@ -25,8 +25,8 @@ class IDS(Search):
         self.frontier = [node]
 
     def frontier_push(self, node, _):
-        # Não armazenamos o vetor de explorados para manter o custo linear
-        if node.state in self.frontier:
+        # Não armazenamos o vetor de explorados para manter o custo linear? Expansões desncessárias?
+        if node.state in self.frontier or node.state in self.explored:            
             return
         self.frontier.append(node)
     
