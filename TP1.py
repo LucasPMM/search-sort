@@ -22,12 +22,21 @@ if __name__ == '__main__':
     elif algorithm == 'U':
         # print('UCS')
         search = UCS(initial)
+    elif algorithm == 'Uh':
+        # print('UCS_heap')
+        search = UCS_heap(initial)
     elif algorithm == 'A':
         # print('A*')
         search = A_STAR(initial)
+    elif algorithm == 'Ah':
+        # print('A_heap*')
+        search = A_STAR_heap(initial)
     elif algorithm == 'G':
         # print('GREEDY')
         search = GREEDY(initial)
+    elif algorithm == 'Gh':
+        # print('GREEDY')
+        search = GREEDY_heap(initial)
 
     cost, expansions, path = search.start()
     end = timeit.default_timer()
