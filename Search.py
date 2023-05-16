@@ -49,8 +49,10 @@ class Search():
         return sum(1 for i in range(len(node.state)) if node.state[i] != self.goal[i])
 
     def next_node(self):
-        if self.algorithm in ['B', 'I']:
+        if self.algorithm in ['B']:
             return self.frontier.pop(0)
+        if self.algorithm in ['I']:
+            return self.frontier.pop()
         elif self.algorithm in ['U', 'G', 'A']:
             _, _, node = self.frontier.get()
             return node
@@ -84,7 +86,8 @@ class Search():
                 continue
 
             # Evitar a fronteira na IDS?
-            self.set_explored(node)
+            if self.algorithm != 'IDS':
+                self.set_explored(node)
             self.expand(node)
 
     def start_frontier(self):
