@@ -25,6 +25,7 @@ class IDS(Search):
         self.frontier = [node]
 
     def frontier_push(self, node, _):
+        # Não armazenamos o vetor de explorados para manter o custo linear
         if node.state in self.frontier:
             return
         self.frontier.append(node)
